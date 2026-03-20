@@ -302,10 +302,12 @@ def build_prompt(base64_queue_image, base64_matt_image):
 def call_comfy_api(base64_queue_image, base64_matt_image):
     print("Calling ComfyUI /prompt API...")
 
-    payload = build_prompt(base64_queue_image, base64_matt_image)
+  workflow = build_prompt(base64_queue_image, base64_matt_image)
+  payload = {"prompt": workflow}
+  endpoint = f"{COMFY_API_URL.rstrip('/')}/prompt"
 
     response = requests.post(
-        f"{COMFY_API_URL}/prompt",
+    endpoint,
         json=payload,
         headers={"Content-Type": "application/json"},
         timeout=300

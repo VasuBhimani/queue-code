@@ -8,7 +8,7 @@ import copy
 
 QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/448049811369/video-upload-queue"
 AWS_REGION = "us-east-1"
-COMFY_API_URL = "http://54.172.178.65:3000/prompt"
+COMFY_API_URL = "http://54.172.178.65:3000"
 
 # Validate required ones
 if not QUEUE_URL:
