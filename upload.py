@@ -8,9 +8,9 @@ from watchdog.events import FileSystemEventHandler
 # CONFIGURATION
 # ==============================
 WATCH_FOLDER = "/home/ubuntu/ComfyUI/output"
-BUCKET_NAME = "video-display-bucket"
-S3_FOLDER = "videos"
-REGION = "ap-south-1"
+BUCKET_NAME = "video-gen-pune"
+S3_FOLDER = "video"
+REGION = "us-east-1"
 
 # ==============================
 # S3 CLIENT

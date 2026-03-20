@@ -6,12 +6,12 @@ import time
 import uuid
 import requests
 
-QUEUE_URL = os.getenv("IMAGE_QUEUE_URL")
-REGION = os.getenv("AWS_REGION")
-BUCKET_NAME = os.getenv("BUCKET_NAME")
-STATIC_KEY = os.getenv("STATIC_KEY")
+QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/448049811369/image-upload-queue"
+REGION = "us-east-1"
+BUCKET_NAME = "video-gen-pune"
+STATIC_KEY = "matt.jpeg"
 
-COMFY_API_URL = os.getenv("COMFY_API_URL", "http://localhost:3000")
+COMFY_API_URL = "http://54.172.178.65:3000/prompt"
 
 # Validate required variables
 if not QUEUE_URL:
