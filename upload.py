@@ -7,7 +7,7 @@ from watchdog.events import FileSystemEventHandler
 
 # --- CONFIG ---
 WATCH_FOLDER = "/home/ubuntu/ComfyUI/output"   # Local folder to watch
-S3_BUCKET = "tvideo-gen-pune"
+S3_BUCKET = "video-gen-pune"
 S3_PREFIX = "video/"           
 AWS_REGION = "us-east-1"
 
