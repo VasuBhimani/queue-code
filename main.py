@@ -55,7 +55,7 @@ def get_base64_from_s3(bucket, key):
 # ----------------------------
 def build_prompt(base64_queue_image, base64_matt_image):
     prompt_id = str(uuid.uuid4())
-    payload = {
+    workflow = {
   "60": {
     "inputs": {
       "filename_prefix": "ComfyUI",
@@ -294,7 +294,14 @@ def build_prompt(base64_queue_image, base64_matt_image):
     }
   }
 }
-    return payload
+    return {"prompt": workflow}
+
+
+def get_comfy_prompt_url(base_url):
+  base = base_url.rstrip("/")
+  if base.endswith("/prompt"):
+    return base
+  return f"{base}/prompt"
 
 # ----------------------------
 # CALL COMFY API
@@ -302,12 +309,11 @@ def build_prompt(base64_queue_image, base64_matt_image):
 def call_comfy_api(base64_queue_image, base64_matt_image):
     print("Calling ComfyUI /prompt API...")
 
-  workflow = build_prompt(base64_queue_image, base64_matt_image)
-  payload = {"prompt": workflow}
-  endpoint = f"{COMFY_API_URL.rstrip('/')}/prompt"
+    payload = build_prompt(base64_queue_image, base64_matt_image)
+    prompt_url = get_comfy_prompt_url(COMFY_API_URL)
 
     response = requests.post(
-    endpoint,
+    prompt_url,
         json=payload,
         headers={"Content-Type": "application/json"},
         timeout=300
