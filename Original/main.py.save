@@ -1,0 +1,148 @@
+import boto3
+import json
+import base64
+import os
+import time
+
+# ----------------------------
+# CONFIG
+# ----------------------------
+QUEUE_URL = "https://sqs.ap-south-1.amazonaws.com/448049811369/raw-queue"
+REGION = "ap-south-1"
+
+STATIC_BUCKET = "video-display-bucket"
+STATIC_KEY = "matt.jpeg"
+
+# ----------------------------
+# AWS CLIENTS
+# ----------------------------
+sqs = boto3.client("sqs", region_name=REGION)
+s3 = boto3.client("s3", region_name=REGION)
+
+# ----------------------------
+# DOWNLOAD IMAGE FROM S3
+# ----------------------------
+def download_from_s3(bucket, key):
+    response = s3.get_object(Bucket=bucket, Key=key)
+    return response["Body"].read()
+
+# ----------------------------
+# UPLOAD IMAGE TO S3
+# ----------------------------
+def upload_to_s3(bucket, key, image_bytes):
+    s3.put_object(
+        Bucket=bucket,
+        Key=key,
+        Body=image_bytes,
+        ContentType="image/png"
+    )
+
+# ----------------------------
+# CONVERT S3 IMAGE TO BASE64
+# ----------------------------
+def get_base64_from_s3(bucket, key):
+    image_bytes = download_from_s3(bucket, key)
+    return base64.b64encode(image_bytes).decode("utf-8")
+
+# ----------------------------
+# API CALL FUNCTION (2 IMAGES)
+# ----------------------------
+def generate_image_from_api(base64_image_1, base64_image_2):
+    """
+    base64_image_1 -> dynamic user image
+    base64_image_2 -> static matt image
+    Replace this with real API call later
+    """
+
+    print("Calling external API with TWO images...")
+
+    # Example payload structure
+    payload = {
+        "input_image": base64_image_1,
+        "reference_image": base64_image_2
+    }
+
+    # 🔥 Here you will put your real API call
+    # For now, simulate processing
+    
+    # Simulate generated output (returning original for now)
+    return base64_image_1
+
+# ----------------------------
+# WORKER LOOP
+# ----------------------------
+print("Worker started...")
+
+while True:
+    response = sqs.receive_message(
+        QueueUrl=QUEUE_URL,
+        MaxNumberOfMessages=1,
+        WaitTimeSeconds=20,
+        VisibilityTimeout=300
+    )
+
+    if "Messages" not in response:
+        print("No job found...")
+        continue
+
+    message = response["Messages"][0]
+    receipt_handle = message["ReceiptHandle"]
+    body = json.loads(message["Body"])
+
+    try:
+        bucket = body["bucket"]
+        key = body["key"]  # Example: raw/input.jpg
+
+        print(f"\nProcessing: {bucket}/{key}")
+
+        # Extract original filename
+        original_filename = os.path.basename(key)
+
+        # -----------------------------------
+        # 1️⃣ Dynamic Image (from queue)
+        # -----------------------------------
+        base64_image = get_base64_from_s3(bucket, key)
+
+        # -----------------------------------
+        # 2️⃣ Static Image (matt.jpeg)
+        # -----------------------------------
+        static_base64_image = get_base64_from_s3(
+            STATIC_BUCKET,
+            STATIC_KEY
+        )
+
+        # -----------------------------------
+        # 3️⃣ Call API with BOTH images
+        # -----------------------------------
+        generated_base64 = generate_image_from_api(
+            base64_image,
+            static_base64_image
+        )
+
+        # -----------------------------------
+        # 4️⃣ Convert back to bytes
+        # -----------------------------------
+        generated_bytes = base64.b64decode(generated_base64)
+
+        # -----------------------------------
+        # 5️⃣ Upload to genimage folder
+        # -----------------------------------
+        output_key = f"genimage/{original_filename}"
+
+        upload_to_s3(bucket, output_key, generated_bytes)
+
+        print(f"Uploaded generated image to: {output_key}")
+
+        # -----------------------------------
+        # 6️⃣ Delete SQS message
+        # -----------------------------------
+        sqs.delete_message(
+            QueueUrl=QUEUE_URL,
+            ReceiptHandle=receipt_handle
+        )
+
+        print("Job completed successfully ✅")
+
+    except Exception as e:
+        print("Job failed ❌:", e)
+        print("Message will retry automatically")
