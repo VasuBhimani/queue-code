@@ -11,7 +11,7 @@ REGION = "us-east-1"
 BUCKET_NAME = "video-gen-pune"
 STATIC_KEY = "matt.jpeg"
 
-COMFY_API_URL = "http://54.172.178.65:3000/prompt"
+COMFY_API_URL = "http://54.172.178.65:3000"
 
 # Validate required variables
 if not QUEUE_URL:
