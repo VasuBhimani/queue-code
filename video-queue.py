@@ -6,7 +6,7 @@ import time
 import requests
 import copy
 
-QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/448049811369/video-upload-queue"
+QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/448049811369/processed-image-queue"
 AWS_REGION = "us-east-1"
 COMFY_API_URL = "http://54.172.178.65:3000/prompt"
 
