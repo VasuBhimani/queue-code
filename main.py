@@ -391,7 +391,7 @@ while True:
         # -----------------------------------
         # 5️⃣ Upload to genimage folder
         # -----------------------------------
-        output_key = f"genimage/{original_filename}"
+        output_key = f"genImage/{original_filename}"
         upload_to_s3(bucket, output_key, generated_bytes)
         print(f"Uploaded generated image to: {output_key}")
 
