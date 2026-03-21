@@ -159,8 +159,8 @@ COMFY_PROMPT_PAYLOAD = {
         },
         "67": {
             "inputs": {
-                "width": 1024,
-                "height": 1536,
+                "width": 768,
+                "height": 1152,
                 "length": 97,
                 "batch_size": 1,
                 "positive": ["6", 0],
